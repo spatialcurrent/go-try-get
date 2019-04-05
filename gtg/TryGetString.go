@@ -47,16 +47,18 @@ func TryGetString(obj interface{}, name string, fallback string) string {
 		}
 	case reflect.Map:
 		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
-		if value.IsValid() && !value.IsNil() {
-			actual := value.Interface()
-			actualType := reflect.TypeOf(actual)
-			if actualType.Kind() == reflect.Func {
-				results := reflect.ValueOf(actual).Call([]reflect.Value{})
-				if len(results) == 1 {
-					return fmt.Sprint(results[0].Interface())
+		if value.IsValid() {
+			if k := value.Type().Kind(); k == reflect.String || (!value.IsNil()) {
+				actual := value.Interface()
+				actualType := reflect.TypeOf(actual)
+				if actualType.Kind() == reflect.Func {
+					results := reflect.ValueOf(actual).Call([]reflect.Value{})
+					if len(results) == 1 {
+						return fmt.Sprint(results[0].Interface())
+					}
+				} else {
+					return fmt.Sprint(actual)
 				}
-			} else {
-				return fmt.Sprint(actual)
 			}
 		}
 	}

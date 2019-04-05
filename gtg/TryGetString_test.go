@@ -29,6 +29,7 @@ func TestTryGetString(t *testing.T) {
 
 	testCases := []testCaseString{
 		testCaseString{Object: map[string]interface{}{"a": "x"}, Name: "a", Fallback: "", Output: "x"},
+		testCaseString{Object: map[string]string{"a": "foo"}, Name: "a", Fallback: "bar", Output: "foo"},
 		testCaseString{Object: map[string]interface{}{"a": func() string { return "x" }}, Name: "a", Fallback: "", Output: "x"},
 		testCaseString{Object: struct{ Foo string }{Foo: "bar"}, Name: "Foo", Fallback: "", Output: "bar"},
 		testCaseString{Object: testCaseStringStruct{}, Name: "Foo", Fallback: "", Output: "bar"},

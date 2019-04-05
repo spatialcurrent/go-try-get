@@ -45,16 +45,19 @@ func TryGet(obj interface{}, name string, fallback interface{}) interface{} {
 		}
 	case reflect.Map:
 		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
-		if value.IsValid() && !value.IsNil() {
-			actual := value.Interface()
-			actualType := reflect.TypeOf(actual)
-			if actualType.Kind() == reflect.Func {
-				results := reflect.ValueOf(actual).Call([]reflect.Value{})
-				if len(results) == 1 {
-					return results[0].Interface()
+		if value.IsValid() {
+			// when obj map[string]string, then you can't call IsNill on the value
+			if k := value.Type().Kind(); k == reflect.String || (!value.IsNil()) {
+				actual := value.Interface()
+				actualType := reflect.TypeOf(actual)
+				if actualType.Kind() == reflect.Func {
+					results := reflect.ValueOf(actual).Call([]reflect.Value{})
+					if len(results) == 1 {
+						return results[0].Interface()
+					}
+				} else {
+					return actual
 				}
-			} else {
-				return actual
 			}
 		}
 	}
