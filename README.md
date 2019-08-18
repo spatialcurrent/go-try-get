@@ -19,18 +19,15 @@ You can import **go-try-get** as a library with:
 
 ```
 import (
-  "github.com/spatialcurrent/go-try-get/gtg"
+  "github.com/spatialcurrent/go-try-get/pkg/gtg"
 )
-...
-object := map[string]string{"yo":"yo"}
-...
-if gtg.TryGetString(object, "yo", "what") == "yo" {
-  ...
-}
-...
 ```
 
 See [gtg](https://godoc.org/github.com/spatialcurrent/go-try-get/gtg) in GoDoc for information on how to use Go API.
+
+# Testing
+
+To run Go tests use `make test` (or `bash scripts/test.sh`), which runs unit tests, `go vet`, `go vet with shadow`, [errcheck](https://github.com/kisielk/errcheck), [ineffassign](https://github.com/gordonklaus/ineffassign), [staticcheck](https://staticcheck.io/), and [misspell](https://github.com/client9/misspell).
 
 # Contributing
 

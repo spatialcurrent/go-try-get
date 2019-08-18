@@ -5,18 +5,7 @@
 //
 // =================================================================
 
+// Package gtg wraps around the reflect package to provide
+// a standard abstraction layer for getting values by name from objects
+// (structs, maps, and single-value "property" functions).
 package gtg
-
-type intStruct struct{}
-
-func (t intStruct) Foo() int64 {
-	return int64(10)
-}
-
-func (t intStruct) Bar() int32 {
-	return int32(10)
-}
-
-func (t intStruct) Lol() int {
-	return 10
-}
