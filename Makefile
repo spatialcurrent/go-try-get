@@ -5,18 +5,6 @@
 #
 # =================================================================
 
-ifdef GOPATH
-GCFLAGS=-trimpath=$(shell printenv GOPATH)/src
-else
-GCFLAGS=-trimpath=$(shell go env GOPATH)/src
-endif
-
-LDFLAGS=-X main.gitBranch=$(shell git branch | grep \* | cut -d ' ' -f2) -X main.gitCommit=$(shell git rev-list -1 HEAD)
-
-ifndef DEST
-DEST=bin
-endif
-
 .PHONY: help
 
 help:  ## Print the help documentation
