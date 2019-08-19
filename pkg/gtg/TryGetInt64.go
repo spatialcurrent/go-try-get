@@ -28,12 +28,12 @@ var int64Type = reflect.TypeOf(int64(0))
 //
 func TryGetInt64(obj interface{}, name string, fallback int64) int64 {
 
-	objectType := reflect.TypeOf(obj)
 	objectValue := reflect.ValueOf(obj)
-	if objectType.Kind() == reflect.Ptr {
-		objectType = objectType.Elem()
+	for reflect.TypeOf(objectValue.Interface()).Kind() == reflect.Ptr {
 		objectValue = objectValue.Elem()
 	}
+	objectValue = reflect.ValueOf(objectValue.Interface()) // sets value to concerete type
+	objectType := objectValue.Type()
 
 	switch objectType.Kind() {
 	case reflect.Struct:
@@ -57,7 +57,13 @@ func TryGetInt64(obj interface{}, name string, fallback int64) int64 {
 		}
 	case reflect.Map:
 		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
-		if value.IsValid() && !value.IsNil() {
+		if value.IsValid() {
+			switch value.Type().Kind() {
+			case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Slice:
+				if !value.IsNil() {
+					return fallback
+				}
+			}
 			actual := value.Interface()
 			actualType := reflect.TypeOf(actual)
 			if actualType.Kind() == reflect.Func {

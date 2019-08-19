@@ -20,19 +20,14 @@ import (
 //    then return the value by name as a string using `fmt.Sprint`.
 //  - If the value by name does not exist, then returns the value of the fallback parameter.
 //
-// Examples
-//
-//  - TryGetString(map[string]int{"yo":"yo"}, "yo", "what") == "yo"
-//  - TryGetString(map[string]string{"yo":"yo"}, "hey", "what") == "what"
-//
 func TryGetString(obj interface{}, name string, fallback string) string {
 
-	objectType := reflect.TypeOf(obj)
 	objectValue := reflect.ValueOf(obj)
-	if objectType.Kind() == reflect.Ptr {
-		objectType = objectType.Elem()
+	for reflect.TypeOf(objectValue.Interface()).Kind() == reflect.Ptr {
 		objectValue = objectValue.Elem()
 	}
+	objectValue = reflect.ValueOf(objectValue.Interface()) // sets value to concerete type
+	objectType := objectValue.Type()
 
 	switch objectType.Kind() {
 	case reflect.Struct:
@@ -48,17 +43,21 @@ func TryGetString(obj interface{}, name string, fallback string) string {
 	case reflect.Map:
 		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
 		if value.IsValid() {
-			if k := value.Type().Kind(); k == reflect.String || (!value.IsNil()) {
-				actual := value.Interface()
-				actualType := reflect.TypeOf(actual)
-				if actualType.Kind() == reflect.Func {
-					results := reflect.ValueOf(actual).Call([]reflect.Value{})
-					if len(results) == 1 {
-						return fmt.Sprint(results[0].Interface())
-					}
-				} else {
-					return fmt.Sprint(actual)
+			switch value.Type().Kind() {
+			case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Slice:
+				if !value.IsNil() {
+					return fallback
 				}
+			}
+			actual := value.Interface()
+			actualType := reflect.TypeOf(actual)
+			if actualType.Kind() == reflect.Func {
+				results := reflect.ValueOf(actual).Call([]reflect.Value{})
+				if len(results) == 1 {
+					return fmt.Sprint(results[0].Interface())
+				}
+			} else {
+				return fmt.Sprint(actual)
 			}
 		}
 	}
