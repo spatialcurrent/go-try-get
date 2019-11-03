@@ -21,6 +21,12 @@ func (t testCaseIntStruct) Int() int {
 	return 10
 }
 
+type testCaseInterfaceSliceStruct struct{}
+
+func (t testCaseInterfaceSliceStruct) Foo() []interface{} {
+	return []interface{}{"a", "b", "c"}
+}
+
 type testCaseStringSliceStruct struct{}
 
 func (t testCaseStringSliceStruct) Foo() []string {
