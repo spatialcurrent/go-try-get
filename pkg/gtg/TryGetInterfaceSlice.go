@@ -8,23 +8,22 @@
 package gtg
 
 import (
-	"fmt"
 	"reflect"
 )
 
-// TryGetStringSlice returns the value from the object (a map or struct) by name.
+// TryGetInterfaceSlice returns the value from the object (a map or struct) by name.
 //  - If the name refers to a struct method or func in a map, then call the function.
-//    If the function only returns 1 value, then return the result as a 1 element string slice using `fmt.Sprint`,
+//    If the function only returns 1 value, then return the result as a 1 element string slice,
 //    otherwise return the value of the fallback parameter.
 //  - If the name refers to a struct field or map key (and not a function),
-//    then return the value by name as a string array using `fmt.Sprint`.
+//    then return the value by name as a interface slice.
 //  - If the value by name does not exist, then returns the value of the fallback parameter.
 //
 // Examples
 //
-//  - TryGetStringSlice(map[string]string{"yo":[]string{"a", "b", "c"}}, "yo", "what") == []string{"a", "b", "c"}
+//  - TryGetInterfaceSlice(map[string]string{"yo":[]interface{}{"a", "b", "c"}}, "yo", "what") == []interface{}{"a", "b", "c"}
 //
-func TryGetStringSlice(obj interface{}, name string, fallback []string) []string {
+func TryGetInterfaceSlice(obj interface{}, name string, fallback []interface{}) []interface{} {
 
 	objectType := reflect.TypeOf(obj)
 	objectValue := reflect.ValueOf(obj)
@@ -40,11 +39,11 @@ func TryGetStringSlice(obj interface{}, name string, fallback []string) []string
 			if t := reflect.TypeOf(arr); t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
 				values := reflect.ValueOf(arr)
 				length := values.Len()
-				strs := make([]string, 0, length)
+				out := make([]interface{}, 0, length)
 				for i := 0; i < length; i++ {
-					strs = append(strs, fmt.Sprint(values.Index(i).Interface()))
+					out = append(out, values.Index(i).Interface())
 				}
-				return strs
+				return out
 			}
 		} else if _, ok := objectType.MethodByName(name); ok {
 			fn := objectValue.MethodByName(name)
@@ -54,11 +53,11 @@ func TryGetStringSlice(obj interface{}, name string, fallback []string) []string
 				if t := reflect.TypeOf(arr); t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
 					values := reflect.ValueOf(arr)
 					length := values.Len()
-					strs := make([]string, 0, length)
+					out := make([]interface{}, 0, length)
 					for i := 0; i < length; i++ {
-						strs = append(strs, fmt.Sprint(values.Index(i).Interface()))
+						out = append(out, values.Index(i).Interface())
 					}
-					return strs
+					return out
 				}
 			}
 		}
@@ -66,6 +65,9 @@ func TryGetStringSlice(obj interface{}, name string, fallback []string) []string
 		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
 		if value.IsValid() && !value.IsNil() {
 			actual := value.Interface()
+			if out, ok := actual.([]interface{}); ok {
+				return out
+			}
 			actualType := reflect.TypeOf(actual)
 			if actualType.Kind() == reflect.Func {
 				results := reflect.ValueOf(actual).Call([]reflect.Value{})
@@ -74,21 +76,21 @@ func TryGetStringSlice(obj interface{}, name string, fallback []string) []string
 					if t := reflect.TypeOf(arr); t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
 						values := reflect.ValueOf(arr)
 						length := values.Len()
-						strs := make([]string, 0, length)
+						out := make([]interface{}, 0, length)
 						for i := 0; i < length; i++ {
-							strs = append(strs, fmt.Sprint(values.Index(i).Interface()))
+							out = append(out, values.Index(i).Interface())
 						}
-						return strs
+						return out
 					}
 				}
 			} else if actualType.Kind() == reflect.Array || actualType.Kind() == reflect.Slice {
 				values := reflect.ValueOf(actual)
 				length := values.Len()
-				strs := make([]string, 0, length)
+				out := make([]interface{}, 0, length)
 				for i := 0; i < length; i++ {
-					strs = append(strs, fmt.Sprint(values.Index(i).Interface()))
+					out = append(out, values.Index(i).Interface())
 				}
-				return strs
+				return out
 			}
 		}
 	}
