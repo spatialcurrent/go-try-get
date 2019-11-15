@@ -80,6 +80,9 @@ func tryGetIntValue(objectValue reflect.Value, name string, fallback int) int {
 		}
 		valueValue = reflect.ValueOf(valueValue.Interface()) // sets value to concerete type
 		valueKind := valueValue.Kind()
+		if !valueValue.IsValid() {
+			return fallback
+		}
 		if valueKind == reflect.Int {
 			return valueValue.Interface().(int)
 		}

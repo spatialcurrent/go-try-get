@@ -18,7 +18,10 @@ func TestTryGetString(t *testing.T) {
 		assert.Equal(t, "bar", TryGetString(nil, "foo", "bar"))
 	})
 	t.Run("MapStringInterface", func(t *testing.T) {
-		assert.Equal(t, "bar", TryGetString(map[string]interface{}{"foo": "bar"}, "foo", ""))
+		in := map[string]interface{}{"foo": "bar", "world": nil}
+		assert.Equal(t, "bar", TryGetString(in, "foo", ""))
+		assert.Equal(t, "", TryGetString(in, "hello", ""))
+		assert.Equal(t, "", TryGetString(in, "world", ""))
 	})
 	t.Run("MapStringInterfacePointer", func(t *testing.T) {
 		assert.Equal(t, "bar", TryGetString(&map[string]interface{}{"foo": "bar"}, "foo", ""))

@@ -65,6 +65,9 @@ func tryGetValue(objectValue reflect.Value, name string, fallback interface{}) i
 		}
 		valueValue = reflect.ValueOf(valueValue.Interface()) // sets value to concerete type
 		valueKind := valueValue.Kind()
+		if !valueValue.IsValid() {
+			return fallback
+		}
 		if valueKind == reflect.Func {
 			results := valueValue.Call([]reflect.Value{})
 			if len(results) == 1 {

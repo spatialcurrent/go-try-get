@@ -103,6 +103,9 @@ func tryGetStringSliceValue(objectValue reflect.Value, name string, fallback []s
 		}
 		valueValue = reflect.ValueOf(valueValue.Interface()) // sets value to concerete type
 		valueKind := valueValue.Kind()
+		if !valueValue.IsValid() {
+			return fallback
+		}
 		if valueKind == reflect.Func {
 			if results := valueValue.Call([]reflect.Value{}); len(results) == 1 {
 				if result := results[0]; result.IsValid() && result.CanInterface() {
