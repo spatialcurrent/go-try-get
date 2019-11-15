@@ -21,45 +21,73 @@ import (
 //  - If the value by name does not exist, then returns the value of the fallback parameter.
 //
 func TryGetString(obj interface{}, name string, fallback string) string {
+	return tryGetStringValue(reflect.ValueOf(obj), name, fallback)
+}
 
-	objectValue := reflect.ValueOf(obj)
-	for reflect.TypeOf(objectValue.Interface()).Kind() == reflect.Ptr {
-		objectValue = objectValue.Elem()
+func tryGetStringValue(objectValue reflect.Value, name string, fallback string) string {
+
+	if !objectValue.IsValid() {
+		return fallback
 	}
-	objectValue = reflect.ValueOf(objectValue.Interface()) // sets value to concerete type
-	objectType := objectValue.Type()
 
-	switch objectType.Kind() {
+	if !objectValue.CanInterface() {
+		return fallback
+	}
+
+	objectKind := objectValue.Kind()
+
+	if objectKind == reflect.Ptr {
+		return tryGetStringValue(objectValue.Elem(), name, fallback)
+	}
+
+	objectValue = reflect.ValueOf(objectValue.Interface()) // sets value to concerete type
+	objectKind = objectValue.Kind()
+
+	switch objectKind {
 	case reflect.Struct:
-		if _, ok := objectType.FieldByName(name); ok {
-			return fmt.Sprint(objectValue.FieldByName(name).Interface())
-		} else if _, ok := objectType.MethodByName(name); ok {
-			fn := objectValue.MethodByName(name)
-			results := fn.Call([]reflect.Value{})
-			if len(results) == 1 {
-				return fmt.Sprint(results[0].Interface())
+		if field := objectValue.FieldByName(name); field.IsValid() {
+			if fieldKind := field.Kind(); fieldKind == reflect.String {
+				return field.Interface().(string)
+			}
+			return fmt.Sprint(field.Interface())
+		}
+		if method := objectValue.MethodByName(name); method.IsValid() {
+			if results := method.Call([]reflect.Value{}); len(results) == 1 {
+				result := results[0]
+				if resultKind := result.Kind(); resultKind == reflect.String {
+					return result.Interface().(string)
+				}
+				return fmt.Sprint(result.Interface())
 			}
 		}
 	case reflect.Map:
-		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
-		if value.IsValid() {
-			switch value.Type().Kind() {
-			case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Slice:
-				if !value.IsNil() {
-					return fallback
-				}
-			}
-			actual := value.Interface()
-			actualType := reflect.TypeOf(actual)
-			if actualType.Kind() == reflect.Func {
-				results := reflect.ValueOf(actual).Call([]reflect.Value{})
-				if len(results) == 1 {
-					return fmt.Sprint(results[0].Interface())
-				}
-			} else {
-				return fmt.Sprint(actual)
-			}
+		valueValue := objectValue.MapIndex(reflect.ValueOf(name))
+		if !valueValue.IsValid() {
+			return fallback
 		}
+		if !valueValue.CanInterface() {
+			return fallback
+		}
+		valueValue = reflect.ValueOf(valueValue.Interface()) // sets value to concerete type
+		valueKind := valueValue.Kind()
+		if valueKind == reflect.String {
+			return valueValue.Interface().(string)
+		}
+		if valueKind == reflect.Func {
+			results := valueValue.Call([]reflect.Value{})
+			if len(results) == 1 {
+				result := results[0]
+				if result.IsValid() && result.CanInterface() {
+					resultKind := result.Kind()
+					if resultKind == reflect.String {
+						return result.Interface().(string)
+					}
+					return fmt.Sprint(result.Interface())
+				}
+			}
+			return fallback
+		}
+		return fmt.Sprint(valueValue.Interface())
 	}
 
 	return fallback

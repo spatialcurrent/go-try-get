@@ -11,6 +11,42 @@ import (
 	"reflect"
 )
 
+func arrayToInterfaceSlice(array reflect.Value) []interface{} {
+	if arrayElemKind := array.Type().Elem().Kind(); arrayElemKind == reflect.Interface {
+		return array.Slice(0, array.Len()).Interface().([]interface{})
+	}
+	out := make([]interface{}, 0, array.Len())
+	for i := 0; i < array.Len(); i++ {
+		out = append(out, array.Index(i).Interface())
+	}
+	return out
+}
+
+func sliceToInterfaceSlice(slc reflect.Value) []interface{} {
+	if sliceElemKind := slc.Type().Elem().Kind(); sliceElemKind == reflect.Interface {
+		return slc.Interface().([]interface{})
+	}
+	out := make([]interface{}, 0, slc.Len())
+	for i := 0; i < slc.Len(); i++ {
+		out = append(out, slc.Index(i).Interface())
+	}
+	return out
+}
+
+func valueToInterfaceSlice(value reflect.Value) []interface{} {
+	kind := value.Kind()
+	if kind == reflect.String {
+		return []interface{}{value.Interface()}
+	}
+	if kind == reflect.Array {
+		return arrayToInterfaceSlice(value)
+	}
+	if kind == reflect.Slice {
+		return sliceToInterfaceSlice(value)
+	}
+	return []interface{}{value.Interface()}
+}
+
 // TryGetInterfaceSlice returns the value from the object (a map or struct) by name.
 //  - If the name refers to a struct method or func in a map, then call the function.
 //    If the function only returns 1 value, then return the result as a 1 element string slice,
@@ -24,76 +60,57 @@ import (
 //  - TryGetInterfaceSlice(map[string]string{"yo":[]interface{}{"a", "b", "c"}}, "yo", "what") == []interface{}{"a", "b", "c"}
 //
 func TryGetInterfaceSlice(obj interface{}, name string, fallback []interface{}) []interface{} {
+	return tryGetInterfaceSliceValue(reflect.ValueOf(obj), name, fallback)
+}
 
-	objectType := reflect.TypeOf(obj)
-	objectValue := reflect.ValueOf(obj)
-	if objectType.Kind() == reflect.Ptr {
-		objectType = objectType.Elem()
-		objectValue = objectValue.Elem()
+func tryGetInterfaceSliceValue(objectValue reflect.Value, name string, fallback []interface{}) []interface{} {
+
+	if !objectValue.IsValid() {
+		return fallback
 	}
 
-	switch objectType.Kind() {
+	if !objectValue.CanInterface() {
+		return fallback
+	}
+
+	objectKind := objectValue.Kind()
+
+	if objectKind == reflect.Ptr {
+		return tryGetInterfaceSliceValue(objectValue.Elem(), name, fallback)
+	}
+
+	objectValue = reflect.ValueOf(objectValue.Interface()) // sets value to concerete type
+	objectKind = objectValue.Kind()
+
+	switch objectKind {
 	case reflect.Struct:
-		if _, ok := objectType.FieldByName(name); ok {
-			arr := objectValue.FieldByName(name).Interface()
-			if t := reflect.TypeOf(arr); t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
-				values := reflect.ValueOf(arr)
-				length := values.Len()
-				out := make([]interface{}, 0, length)
-				for i := 0; i < length; i++ {
-					out = append(out, values.Index(i).Interface())
-				}
-				return out
-			}
-		} else if _, ok := objectType.MethodByName(name); ok {
-			fn := objectValue.MethodByName(name)
-			results := fn.Call([]reflect.Value{})
-			if len(results) == 1 {
-				arr := results[0].Interface()
-				if t := reflect.TypeOf(arr); t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
-					values := reflect.ValueOf(arr)
-					length := values.Len()
-					out := make([]interface{}, 0, length)
-					for i := 0; i < length; i++ {
-						out = append(out, values.Index(i).Interface())
-					}
-					return out
-				}
+		if field := objectValue.FieldByName(name); field.IsValid() {
+			return valueToInterfaceSlice(field)
+		}
+		if method := objectValue.MethodByName(name); method.IsValid() {
+			if results := method.Call([]reflect.Value{}); len(results) == 1 {
+				return valueToInterfaceSlice(results[0])
 			}
 		}
 	case reflect.Map:
-		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
-		if value.IsValid() && !value.IsNil() {
-			actual := value.Interface()
-			if out, ok := actual.([]interface{}); ok {
-				return out
-			}
-			actualType := reflect.TypeOf(actual)
-			if actualType.Kind() == reflect.Func {
-				results := reflect.ValueOf(actual).Call([]reflect.Value{})
-				if len(results) == 1 {
-					arr := results[0].Interface()
-					if t := reflect.TypeOf(arr); t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
-						values := reflect.ValueOf(arr)
-						length := values.Len()
-						out := make([]interface{}, 0, length)
-						for i := 0; i < length; i++ {
-							out = append(out, values.Index(i).Interface())
-						}
-						return out
-					}
-				}
-			} else if actualType.Kind() == reflect.Array || actualType.Kind() == reflect.Slice {
-				values := reflect.ValueOf(actual)
-				length := values.Len()
-				out := make([]interface{}, 0, length)
-				for i := 0; i < length; i++ {
-					out = append(out, values.Index(i).Interface())
-				}
-				return out
-			}
+		valueValue := objectValue.MapIndex(reflect.ValueOf(name))
+		if !valueValue.IsValid() {
+			return fallback
 		}
+		if !valueValue.CanInterface() {
+			return fallback
+		}
+		valueValue = reflect.ValueOf(valueValue.Interface()) // sets value to concerete type
+		valueKind := valueValue.Kind()
+		if valueKind == reflect.Func {
+			if results := valueValue.Call([]reflect.Value{}); len(results) == 1 {
+				if result := results[0]; result.IsValid() && result.CanInterface() {
+					return valueToInterfaceSlice(result)
+				}
+			}
+			return fallback
+		}
+		return valueToInterfaceSlice(valueValue)
 	}
-
 	return fallback
 }
