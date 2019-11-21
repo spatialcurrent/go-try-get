@@ -13,34 +13,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTryGetIntMapStringInterface(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(map[string]interface{}{"foo": 10}, "foo", 0))
-}
-
-func TestTryGetIntMapStringInterfaceFallback(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(map[string]interface{}{}, "foo", 10))
-}
-
-func TestTryGetIntMapStringInt(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(map[string]int{"foo": 10}, "foo", 0))
-}
-
-func TestTryGetIntMapStringFunc(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(map[string]interface{}{"foo": func() int { return 10 }}, "foo", 0))
-}
-
-func TestTryGetIntStructField(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(struct{ Foo int }{Foo: 10}, "Foo", 0))
-}
-
-func TestTryGetIntStructMethodInt(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(testCaseIntStruct{}, "Int", 0))
-}
-
-func TestTryGetIntStructMethodInt32(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(testCaseIntStruct{}, "Int32", 0))
-}
-
-func TestTryGetIntStructMethodInt64(t *testing.T) {
-	assert.Equal(t, 10, TryGetInt(testCaseIntStruct{}, "Int64", 0))
+func TestTryGetInt(t *testing.T) {
+	t.Run("Nil", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(nil, "foo", 10))
+	})
+	t.Run("MapStringInterface", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(map[string]interface{}{"foo": 10}, "foo", 0))
+	})
+	t.Run("MapStringInterfacePointer", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(&map[string]interface{}{"foo": 10}, "foo", 0))
+	})
+	t.Run("MapStringInt", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(map[string]int{"foo": 10}, "foo", 0))
+	})
+	t.Run("MapStringFunc", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(map[string]interface{}{"foo": func() int { return 10 }}, "foo", 0))
+	})
+	t.Run("StructField", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(struct{ Foo int }{Foo: 10}, "Foo", 0))
+	})
+	t.Run("StructFieldPointer", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(&struct{ Foo int }{Foo: 10}, "Foo", 0))
+	})
+	t.Run("StructMethodInt", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(testCaseIntStruct{}, "Int", 0))
+	})
+	t.Run("StructMethodInt32", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(testCaseIntStruct{}, "Int32", 0))
+	})
+	t.Run("StructMethodInt64", func(t *testing.T) {
+		assert.Equal(t, 10, TryGetInt(testCaseIntStruct{}, "Int64", 0))
+	})
 }

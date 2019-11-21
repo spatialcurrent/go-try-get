@@ -27,63 +27,83 @@ var intType = reflect.TypeOf(0)
 //  - TryGetInt(map[string]int{"yo":10}, "hey", 20) == 20
 //
 func TryGetInt(obj interface{}, name string, fallback int) int {
+	return tryGetIntValue(reflect.ValueOf(obj), name, fallback)
+}
 
-	objectValue := reflect.ValueOf(obj)
-	for reflect.TypeOf(objectValue.Interface()).Kind() == reflect.Ptr {
-		objectValue = objectValue.Elem()
+func tryGetIntValue(objectValue reflect.Value, name string, fallback int) int {
+
+	if !objectValue.IsValid() {
+		return fallback
 	}
-	objectValue = reflect.ValueOf(objectValue.Interface()) // sets value to concerete type
-	objectType := objectValue.Type()
 
-	switch objectType.Kind() {
+	if !objectValue.CanInterface() {
+		return fallback
+	}
+
+	objectKind := objectValue.Kind()
+
+	if objectKind == reflect.Ptr {
+		return tryGetIntValue(objectValue.Elem(), name, fallback)
+	}
+
+	objectValue = reflect.ValueOf(objectValue.Interface()) // sets value to concerete type
+	objectKind = objectValue.Kind()
+
+	switch objectKind {
 	case reflect.Struct:
-		if _, ok := objectType.FieldByName(name); ok {
-			v := objectValue.FieldByName(name).Interface()
-			if reflect.TypeOf(v).ConvertibleTo(intType) {
-				return reflect.ValueOf(v).Convert(intType).Interface().(int)
+		if field := objectValue.FieldByName(name); field.IsValid() {
+			if fieldKind := field.Kind(); fieldKind == reflect.Int {
+				return field.Interface().(int)
 			}
-		} else if _, ok := objectType.MethodByName(name); ok {
-			fn := objectValue.MethodByName(name)
-			results := fn.Call([]reflect.Value{})
-			if len(results) == 1 {
-				result := results[0].Interface()
-				resultType := reflect.TypeOf(result)
-				if resultType.Kind() == reflect.Int {
-					return result.(int)
-				} else if resultType.ConvertibleTo(intType) {
-					return reflect.ValueOf(result).Convert(intType).Interface().(int)
+			if fieldType := field.Type(); fieldType.ConvertibleTo(intType) {
+				return field.Convert(intType).Interface().(int)
+			}
+		}
+		if method := objectValue.MethodByName(name); method.IsValid() {
+			if results := method.Call([]reflect.Value{}); len(results) == 1 {
+				result := results[0]
+				if resultKind := result.Kind(); resultKind == reflect.Int {
+					return result.Interface().(int)
+				}
+				if resultType := result.Type(); resultType.ConvertibleTo(intType) {
+					return result.Convert(intType).Interface().(int)
 				}
 			}
 		}
 	case reflect.Map:
-		value := reflect.ValueOf(obj).MapIndex(reflect.ValueOf(name))
-		if value.IsValid() {
-			switch value.Type().Kind() {
-			case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Slice:
-				if !value.IsNil() {
-					return fallback
-				}
-			}
-			actual := value.Interface()
-			actualType := reflect.TypeOf(actual)
-			if actualType.Kind() == reflect.Func {
-				results := reflect.ValueOf(actual).Call([]reflect.Value{})
-				if len(results) == 1 {
-					result := results[0].Interface()
-					resultType := reflect.TypeOf(result)
-					if resultType.Kind() == reflect.Int {
-						return result.(int)
-					} else if resultType.ConvertibleTo(intType) {
-						return reflect.ValueOf(result).Convert(intType).Interface().(int)
+		valueValue := objectValue.MapIndex(reflect.ValueOf(name))
+		if !valueValue.IsValid() {
+			return fallback
+		}
+		if !valueValue.CanInterface() {
+			return fallback
+		}
+		valueValue = reflect.ValueOf(valueValue.Interface()) // sets value to concerete type
+		valueKind := valueValue.Kind()
+		if !valueValue.IsValid() {
+			return fallback
+		}
+		if valueKind == reflect.Int {
+			return valueValue.Interface().(int)
+		}
+		if valueType := valueValue.Type(); valueType.ConvertibleTo(intType) {
+			return valueValue.Convert(intType).Interface().(int)
+		}
+		if valueKind == reflect.Func {
+			results := valueValue.Call([]reflect.Value{})
+			if len(results) == 1 {
+				result := results[0]
+				if result.IsValid() && result.CanInterface() {
+					resultKind := result.Kind()
+					if resultKind == reflect.Int {
+						return result.Interface().(int)
+					}
+					if resultType := result.Type(); resultType.ConvertibleTo(intType) {
+						return result.Convert(intType).Interface().(int)
 					}
 				}
-			} else if actualType.Kind() == reflect.Int {
-				return actual.(int)
-			} else if actualType.ConvertibleTo(intType) {
-				return reflect.ValueOf(actual).Convert(intType).Interface().(int)
 			}
 		}
 	}
-
 	return fallback
 }
