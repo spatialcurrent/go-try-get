@@ -1,10 +1,10 @@
-[![CircleCI](https://circleci.com/gh/spatialcurrent/go-try-get/tree/master.svg?style=svg)](https://circleci.com/gh/spatialcurrent/go-try-get/tree/master) [![Go Report Card](https://goreportcard.com/badge/spatialcurrent/go-try-get)](https://goreportcard.com/report/spatialcurrent/go-try-get)  [![GoDoc](https://godoc.org/github.com/spatialcurrent/go-try-get?status.svg)](https://godoc.org/github.com/spatialcurrent/go-try-get) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/spatialcurrent/go-try-get/blob/master/LICENSE.md)
+[![CircleCI](https://circleci.com/gh/spatialcurrent/go-try-get/tree/master.svg?style=svg)](https://circleci.com/gh/spatialcurrent/go-try-get/tree/master) [![Go Report Card](https://goreportcard.com/badge/spatialcurrent/go-try-get)](https://goreportcard.com/report/spatialcurrent/go-try-get)  [![PkgGoDev](https://pkg.go.dev/badge/github.com/spatialcurrent/go-try-get)](https://pkg.go.dev/github.com/spatialcurrent/go-try-get) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/spatialcurrent/go-try-get/blob/master/LICENSE.md)
 
 # go-try-get
 
 # Description
 
-**go-try-get** aka (GTG) is a package that wraps around the [reflect](https://godoc.org/reflect) package to provide a standard abstraction layer for getting values by name from objects (structs, maps, and single-value "property" functions).  GTG is used by:
+**go-try-get** aka (GTG) is a package that wraps around the [reflect](https://pkg.go.dev/reflect) package to provide a standard abstraction layer for getting values by name from objects (structs, maps, and single-value "property" functions).  GTG is used by:
 
 - [go-dfl](https://github.com/spatialcurrent/go-dfl) and
 - [railgun](https://github.com/spatialcurrent/railgun).
@@ -23,7 +23,7 @@ import (
 )
 ```
 
-See [gtg](https://godoc.org/github.com/spatialcurrent/go-try-get/gtg) in GoDoc for information on how to use Go API.
+See [go.dev](https://pkg.go.dev/github.com/spatialcurrent/go-try-get/) for information on how to use Go API.
 
 # Testing
 
