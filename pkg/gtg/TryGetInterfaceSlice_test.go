@@ -1,6 +1,6 @@
 // =================================================================
 //
-// Copyright (C) 2019 Spatial Current, Inc. - All Rights Reserved
+// Copyright (C) 2020 Spatial Current, Inc. - All Rights Reserved
 // Released as open source under the MIT License.  See LICENSE file.
 //
 // =================================================================
@@ -53,5 +53,8 @@ func TestTryGetInterfaceSlice(t *testing.T) {
 	})
 	t.Run("StructMethodInt64", func(t *testing.T) {
 		assert.Equal(t, []interface{}{int64(10)}, TryGetInterfaceSlice(testCaseIntStruct{}, "Int64", []interface{}{}))
+	})
+	t.Run("StructMethodInterfaceSlice", func(t *testing.T) {
+		assert.Equal(t, []interface{}{"a", "b", "c"}, TryGetInterfaceSlice(testCaseInterfaceSliceStruct{}, "Foo", []interface{}{}))
 	})
 }

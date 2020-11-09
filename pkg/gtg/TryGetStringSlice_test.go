@@ -1,6 +1,6 @@
 // =================================================================
 //
-// Copyright (C) 2019 Spatial Current, Inc. - All Rights Reserved
+// Copyright (C) 2020 Spatial Current, Inc. - All Rights Reserved
 // Released as open source under the MIT License.  See LICENSE file.
 //
 // =================================================================
@@ -53,5 +53,8 @@ func TestTryGetStringSlice(t *testing.T) {
 	})
 	t.Run("StructMethodInt64", func(t *testing.T) {
 		assert.Equal(t, []string{"10"}, TryGetStringSlice(testCaseIntStruct{}, "Int64", []string{}))
+	})
+	t.Run("StructMethodStringSlice", func(t *testing.T) {
+		assert.Equal(t, []string{"a", "b", "c"}, TryGetStringSlice(testCaseStringSliceStruct{}, "Foo", []string{}))
 	})
 }

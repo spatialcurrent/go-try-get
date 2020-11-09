@@ -1,6 +1,6 @@
 // =================================================================
 //
-// Copyright (C) 2019 Spatial Current, Inc. - All Rights Reserved
+// Copyright (C) 2020 Spatial Current, Inc. - All Rights Reserved
 // Released as open source under the MIT License.  See LICENSE file.
 //
 // =================================================================
@@ -46,5 +46,8 @@ func TestTryGetString(t *testing.T) {
 	})
 	t.Run("StructMethodInt64", func(t *testing.T) {
 		assert.Equal(t, "10", TryGetString(testCaseIntStruct{}, "Int64", ""))
+	})
+	t.Run("StructMethodString", func(t *testing.T) {
+		assert.Equal(t, "bar", TryGetString(testCaseStringStruct{}, "Foo", ""))
 	})
 }
