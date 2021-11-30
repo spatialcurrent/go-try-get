@@ -12,4 +12,4 @@ This library is still in alpha (0.x.x), so versioning is not semantic yet.
 
 ## Authors
 
-See [AUTHORS](https://github.com/spatialcurrent/go-try-get/blob/master/AUTHORS) for a list of contributors.
+See [AUTHORS](https://github.com/spatialcurrent/go-try-get/blob/main/AUTHORS) for a list of contributors.

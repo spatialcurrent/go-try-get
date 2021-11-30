@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/spatialcurrent/go-try-get/tree/main.svg?style=svg)](https://circleci.com/gh/spatialcurrent/go-try-get/tree/main)
 [![Go Report Card](https://goreportcard.com/badge/spatialcurrent/go-try-get?style=flat-square)](https://goreportcard.com/report/github.com/spatialcurrent/go-try-get)
 [![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/spatialcurrent/go-try-get)](https://pkg.go.dev/github.com/spatialcurrent/go-try-get)
-[![License](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/spatialcurrent/go-try-get/blob/master/LICENSE)
+[![License](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/spatialcurrent/go-try-get/blob/main/LICENSE)
 
 # go-try-get
 
@@ -34,7 +34,7 @@ To run Go tests using `make test` or (`bash scripts/test.sh`), which runs unit t
 
 # Contributing
 
-[Spatial Current, Inc.](https://spatialcurrent.io) is currently accepting pull requests for this repository.  We'd love to have your contributions!  Please see [Contributing.md](https://github.com/spatialcurrent/go-try-get/blob/master/CONTRIBUTING.md) for how to get started.
+[Spatial Current, Inc.](https://spatialcurrent.io) is currently accepting pull requests for this repository.  We'd love to have your contributions!  Please see [Contributing.md](https://github.com/spatialcurrent/go-try-get/blob/main/CONTRIBUTING.md) for how to get started.
 
 # License
 
