@@ -1,4 +1,7 @@
-[![CircleCI](https://circleci.com/gh/spatialcurrent/go-try-get/tree/master.svg?style=svg)](https://circleci.com/gh/spatialcurrent/go-try-get/tree/master) [![Go Report Card](https://goreportcard.com/badge/spatialcurrent/go-try-get)](https://goreportcard.com/report/spatialcurrent/go-try-get)  [![PkgGoDev](https://pkg.go.dev/badge/github.com/spatialcurrent/go-try-get)](https://pkg.go.dev/github.com/spatialcurrent/go-try-get) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/spatialcurrent/go-try-get/blob/master/LICENSE.md)
+[![CircleCI](https://circleci.com/gh/spatialcurrent/go-try-get/tree/main.svg?style=svg)](https://circleci.com/gh/spatialcurrent/go-try-get/tree/main)
+[![Go Report Card](https://goreportcard.com/badge/spatialcurrent/go-try-get?style=flat-square)](https://goreportcard.com/report/github.com/spatialcurrent/go-try-get)
+[![PkgGoDev](https://pkg.go.dev/badge/mod/github.com/spatialcurrent/go-try-get)](https://pkg.go.dev/github.com/spatialcurrent/go-try-get)
+[![License](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/spatialcurrent/go-try-get/blob/master/LICENSE)
 
 # go-try-get
 
@@ -23,11 +26,11 @@ import (
 )
 ```
 
-See [go.dev](https://pkg.go.dev/github.com/spatialcurrent/go-try-get/) for information on how to use Go API.
+See [gtg](https://pkg.go.dev/github.com/spatialcurrent/go-try-get/pkg/gtg) in the docs for information on how to use Go API.
 
 # Testing
 
-To run Go tests use `make test` (or `bash scripts/test.sh`), which runs unit tests, `go vet`, `go vet with shadow`, [errcheck](https://github.com/kisielk/errcheck), [ineffassign](https://github.com/gordonklaus/ineffassign), [staticcheck](https://staticcheck.io/), and [misspell](https://github.com/client9/misspell).
+To run Go tests using `make test` or (`bash scripts/test.sh`), which runs unit tests, `go vet`, `go vet with shadow`, [errcheck](https://github.com/kisielk/errcheck), [staticcheck](https://staticcheck.io/), and [misspell](https://github.com/client9/misspell).
 
 # Contributing
 
